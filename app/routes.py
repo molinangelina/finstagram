@@ -1,15 +1,23 @@
+from flask_login import current_user
 from app import app
 from flask import render_template
 
+from .models import User
+
+
 @app.route('/')
 def index():
-    staff = [
-        {'name':'Shoha',
-        'img':'https://img.freepik.com/premium-vector/smiling-face-emoji_1319-431.jpg?w=360',
-        'age': 9000},
-        {'name':'Brandt','img':'https://img.freepik.com/premium-vector/smiling-face-emoji_1319-431.jpg?w=360', 'age': 9001}, {'name':'Blair','img':'https://img.freepik.com/premium-vector/smiling-face-emoji_1319-431.jpg?w=360', 'age': 9002}]
+    users = User.query.order_by(User.username.desc()).all()
+    new_list = []
+    following_set = set()
+    if current_user.is_authenticated:
+        following = current_user.followed.all()
+        following_set = {f.id for f in following}
+    for u in users:
+        if u.id in following_set:
+            u.flag = True
 
-    return render_template('index.html', names=staff)
+    return render_template('index.html', names=users)
 
 @app.route('/contact')
 def contact():
