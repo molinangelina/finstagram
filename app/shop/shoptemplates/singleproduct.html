@@ -2,15 +2,19 @@
 
 {% block content %}
     <div class="mx-auto card text-decoration-none text-center" style="width: 18rem;">
-        <img src="{{ product.img_url }}" class="card-img-top" alt="{{ product.name }}">
+        <img src="{{ url_for('static', filename=img_url) }}" class="card-img-top" alt="{{ product.name }}">
         <div class="card-body">
         <h5 class="card-title">{{ product.name }}</h5>
         <p class="card-text">{{ product.caption }}</p>
         <p class="card-text">{{ product.price }}</p>
-        {% if is_added %}
-            <a class="btn btn-danger" href="{{ url_for('shop.removeFromCart', user_id=product.id) }}">Remove</a>
-        {% else %}
-            <a class="btn btn-primary" href="{{ url_for('shop.addToCart', user_id=product.id) }}">Add to cart</a>
+        {% if current_user.is_authenticated %}
+            {% if current_user.id == product.id %}
+            
+            {% elif product.flag %}
+                <a class="btn btn-danger" href="{{ url_for(shop.removeFromCart), user_id=product.id }}">Remove</a>
+            {% else %}
+                <a class="btn btn-primary" href="{{ url_for(shop.addToCart), user_id=product.id }}">Add to cart</a>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}

@@ -19,7 +19,7 @@ user_pokemon = db.Table('user_pokemon',
     db.Column('pokemon_id', db.Integer, db.ForeignKey('pokemon.id')),
 )
 
-user_product = db.Table('user_products', 
+user_product = db.Table('user_product', 
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('prooduct_id', db.Integer, db.ForeignKey('product.id')),
 )
@@ -153,18 +153,18 @@ class Product(db.Model):
     name = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(5,2), nullable=False)
     img_url = db.Column(db.String(500))
-    description = db.Column(db.Numeric(5,2))
+    description = db.Column(db.String(300))
 
-    def __init__(self, price, name, description, img_url):
+    def __init__(self, name, price, img_url, description):
         self.name = name
         self.price = price
         self.img_url = img_url
         self.description = description
 
-    def save(self):
-        db.session.add(self)
+    def add(self, product):
+        db.session.append(product)
         db.session.commit()
     
-    def remove(self):
-        db.session.delete(self)
+    def remove(self, product):
+        db.session.remove(product)
         db.session.commit()

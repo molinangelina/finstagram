@@ -8,34 +8,35 @@ shop = Blueprint('shop', __name__, template_folder = 'shoptemplates')
 @shop.route('/allproducts')
 def allProducts():
     products = Product.query.all()
-    return render_template('feed.html', products=products)
+    return render_template('products.html', products=products)
 
 # a route which shows a single product (with the information of the product you just clicked)
-@shop.route('/product')
+@shop.route('/product/<int:product_id>')
 @login_required
 def singleProduct(product_id):
     product = Product.query.get(product_id)
     return render_template('singleproduct.html', product=product)
 
 # A route (cart) that shows a list of products you’ve added into your cart as well as the total of all the items in your cart
-@shop.route('/add/<string:product_name>')
+@shop.route('/add/<int:product_id>')
 @login_required
-def addToCart(product_name):
-    product = Product.query.filter_by(name=product_name).first()
+def addToCart(product_id):
+    product = Product.query.get(product_id)
     if current_user.cart.all():
-        current_user.cart.append(product)
-        current_user.save()
+        current_user.cart.add(product)
     else:
         flash('Added to cart', 'success')
     return redirect(url_for('cart.html'))
 
 # Add a route that, when clicked handles functionality that removes all items from your cart one time. Also create a button that, when pressed, it removes that specific product object from the cart.
-@shop.route('/remove/<string:product_name>')
+@shop.route('/remove/<int:product_id>')
 @login_required
 def removeFromCart(product_id):
-    product = Product.query.filter(product_id == product_id).first()
-    current_user.cart.remove(product)
-    flash('Successfully removed!', 'success')
+    product = Product.query.get(product_id)
+    if current_user.cart.all():
+        current_user.cart.remove(product)
+    else:
+        flash('Added to cart', 'success')
     return redirect(url_for('cart.html'))
 
 # @shop.route('/removeall')

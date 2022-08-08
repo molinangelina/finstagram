@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        {% for p in products %}
-            <a class="mx-auto card text-decoration-none text-center" style="width: 18rem;" href="{{ url_for('shop.singleProduct', product_id=p.id) }}">
-                <img src="{{ p.img_url }}" class="card-img-top" alt="{{ p.name }}">
-                <div class="card-body">
-                <h5 class="card-title">{{ p.name }}</h5>
-                <p class="card-text">{{ p.price }}</p>
-                </div>
-            </a>
-        {% endfor %}
-    </div>
+<div class="row">
+    {% for p in products %}
+        <a class="mx-auto card text-decoration-none text-center" style="width: 18rem;" href="{{ url_for('shop.singleProduct', product_id=p.id) }}">
+            <img src="{{ url_for('static', filename=p.img_url) }}" class="card-img-top" alt="{{ p.name }}">
+            <div class="card-body">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p class="card-text">{{ p.price }}</p>
+            </div>
+        </a>
+    {% endfor %}
+</div>
 {% endblock %}
