@@ -5,9 +5,23 @@ from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
+# class Followers(db.Model):
+#     follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+#     followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 followers = db.Table('followers', 
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')),
+)
+
+user_pokemon = db.Table('user_pokemon', 
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('pokemon_id', db.Integer, db.ForeignKey('pokemon.id')),
+)
+
+user_product = db.Table('user_products', 
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('prooduct_id', db.Integer, db.ForeignKey('product.id')),
 )
 
 # create our models based off our ERD
@@ -24,6 +38,16 @@ class User(db.Model, UserMixin):
         backref= db.backref('followers', lazy='dynamic'),
         lazy = 'dynamic'
     )
+    team = db.relationship("Pokemon",
+        secondary=user_pokemon,
+        backref='trainers',
+        lazy='dynamic'
+        )
+    cart = db.relationship("Product",
+        secondary=user_product,
+        backref='customers',
+        lazy='dynamic'
+        )
 
     def __init__(self, username, email, password):
         self.username = username
@@ -44,6 +68,8 @@ class User(db.Model, UserMixin):
             'username': self.username,
             'email': self.email,
         }
+    def saveToDB(self):
+        db.session.commit()
     
     # get all the post that I am following plus my own
     def get_followed_posts(self):
@@ -57,9 +83,29 @@ class User(db.Model, UserMixin):
         all = followed.union(mine).order_by(Post.date_created.desc())
         return all
 
-# class Followers(db.Model):
-#     follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+class Pokemon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+    pokemon_type = db.Column(db.String)
+    ability = db.Column(db.String)
+    img_url = db.Column(db.String)
+    hp = db.Column(db.String)
+    attack = db.Column(db.String)
+    defense = db.Column(db.String)
+
+    def __init__(self, name, pokemon_type, ability, img_url, hp, attack, defense):
+        self.name = name
+        self. pokemon_type = pokemon_type
+        self.ability = ability
+        self.img_url = img_url
+        self.hp = hp
+        self.attack = attack
+        self.defense = defense
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -101,3 +147,24 @@ class Post(db.Model):
             'user_id': self.user_id,
             'author': self.author.username, # username to get the name of author
         }
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Numeric(5,2), nullable=False)
+    img_url = db.Column(db.String(500))
+    description = db.Column(db.Numeric(5,2))
+
+    def __init__(self, price, name, description, img_url):
+        self.name = name
+        self.price = price
+        self.img_url = img_url
+        self.description = description
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()

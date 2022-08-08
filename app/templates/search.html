@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.pokemon_name(class='form-control', placeholder='Enter a Pokemon Name', autocomplete='off') }}
+    {{ form.submit(class='btn btn-primary')}}
+    </form>
+    {% if pokemon_dict %}
+        <div class="card" style="width: 18rem;">
+            <img src="{{ pokemon_dict['img_url'] }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h1 class="card-title">{{ pokemon_dict.name.title() }}</h1>
+                <p class="card-text">
+                    <h5>Type: {{ pokemon_dict.pokemon_type.title() }}</h5>
+                    <h5>Ability: {{ pokemon_dict.ability.title() }}</h5>
+                    <h5>HP: {{ pokemon_dict.hp }}</h5>
+                    <h5>ATTACK: {{ pokemon_dict.attack }}</h5>
+                    <h5>DEFENSE: {{ pokemon_dict.defense }}</h5>
+                </p>
+                {% if is_caught %}
+                <a href="/release/{{ pokemon_dict.name }}" class="btn btn-danger">Release {{ pokemon_dict.name.title() }}</a>
+                {% else %}
+                <a href="/catch/{{ pokemon_dict.name }}" class="btn btn-primary">Catch {{ pokemon_dict.name.title() }}!</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

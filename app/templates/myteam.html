@@ -1,0 +1,23 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+<div class="row">
+    {% for p in team %}
+    <div class="card" style="width: 18rem;">
+        <img src="{{ p['img_url'] }}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h1 class="card-title">{{ p.name.title() }}</h1>
+            <p class="card-text">
+                <h5>Type: {{ p.pokemon_type.title() }}</h5>
+                <h5>Ability: {{ p.ability.title() }}</h5>
+                <h5>HP: {{ p.hp }}</h5>
+                <h5>ATTACK: {{ p.attack }}</h5>
+                <h5>DEFENSE: {{ p.defense }}</h5>
+                <a href="/catch/{{ p.name }}" class="btn btn-danger">Release {{ p.name.title() }}!</a>
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
