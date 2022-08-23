@@ -36,7 +36,7 @@ def removeFromCart(product_id):
     if current_user.cart.all():
         current_user.cart.remove(product)
     else:
-        flash('Added to cart', 'success')
+        flash('Removed from cart', 'danger')
     return redirect(url_for('cart.html'))
 
 # @shop.route('/removeall')
