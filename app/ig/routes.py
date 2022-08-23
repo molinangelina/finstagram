@@ -104,7 +104,7 @@ def unfollowUser(user_id):
 
 
 ####################### API ROUTES #######################
-@ig.route('/api/posts')
+@ig.route('/api/posts', methods=['POST'])
 def getAllPostsAPI():
     args = request.args
     pin = args.get('pin')
@@ -122,7 +122,7 @@ def getAllPostsAPI():
             'message': 'The pin number was incorrect, please try again'
         }
 
-@ig.route('/api/posts/<int:post_id>')
+@ig.route('/api/posts/<int:post_id>', methods=['POST'])
 def getSinglePostsAPI(post_id):
     post = Post.query.get(post_id) #post object
     if post:
