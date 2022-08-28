@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import current_user, login_required
+from app.apiauthhelper import token_required
 from app.ig.forms import PostForm
 from app.models import Post, db, User
 
@@ -104,25 +105,27 @@ def unfollowUser(user_id):
 
 
 ####################### API ROUTES #######################
-@ig.route('/api/posts')
+@ig.route('/api/posts', methods=['POST', 'GET'])
 def getAllPostsAPI():
-    args = request.args
-    pin = args.get('pin')
-    print(pin, type(pin))
-    if pin == '1234':
+    # args = request.args
+    # pin = args.get('pin')
+    # print(pin, type(pin))
+    # if pin == '1234':
 
         posts = Post.query.all() #list of posts
+        posts = Post.query.order_by(Post.date_created.desc()).all() #orders posts in react app
 
         my_posts = [p.to_dict() for p in posts]
+        print(my_posts)
         return {'status': 'ok', 'total_results': len(posts), 'posts': my_posts}
-    else:
-        return {
-            'status': 'not ok',
-            'code': 'Invalid pin',
-            'message': 'The pin number was incorrect, please try again'
-        }
+    # else:
+    #     return {
+    #         'status': 'not ok',
+    #         'code': 'Invalid pin',
+    #         'message': 'The pin number was incorrect, please try again'
+    #     }
 
-@ig.route('/api/posts/<int:post_id>')
+@ig.route('/api/posts/<int:post_id>', methods=['POST'])
 def getSinglePostsAPI(post_id):
     post = Post.query.get(post_id) #post object
     if post:
@@ -137,16 +140,20 @@ def getSinglePostsAPI(post_id):
             'message': f'A post with the id : {post_id} does not exist.'
         }
 
+# decorated protected route
+# passing this func to apiauthhelper
 @ig.route('/api/posts/create', methods=["POST"])
-def createPostsAPI():
+@token_required #running apiauthhelper first that's why it's on top
+# user is current_user. If u passed all the checks, now accepting the user who that token belongs to
+# token is required & it belongs to that user
+def createPostsAPI(user):
     data = request.json # this is coming from POST request Body
 
     title = data['title']
     caption = data['caption']
-    user_id = data['user_id']
-    img_url = data['img_url']
+    img_url = data['imgUrl']
 
-    post = Post(title, img_url, caption, user_id)
+    post = Post(title, img_url, caption, user.id)
     post.save()
 
     return{
