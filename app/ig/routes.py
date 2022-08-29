@@ -125,7 +125,7 @@ def getAllPostsAPI():
     #         'message': 'The pin number was incorrect, please try again'
     #     }
 
-@ig.route('/api/posts/<int:post_id>', methods=['POST'])
+@ig.route('/api/posts/<int:post_id>')
 def getSinglePostsAPI(post_id):
     post = Post.query.get(post_id) #post object
     if post:
@@ -136,7 +136,7 @@ def getSinglePostsAPI(post_id):
             }
     else:
         return{
-            'status': 'error',
+            'status': 'not ok',
             'message': f'A post with the id : {post_id} does not exist.'
         }
 
@@ -151,10 +151,36 @@ def createPostsAPI(user):
 
     title = data['title']
     caption = data['caption']
-    img_url = data['imgUrl']
+    img_url = data['imgUrl'] #expecting it to come as camel case, storing it in snake case
 
     post = Post(title, img_url, caption, user.id)
     post.save()
+
+    return{
+        'status': 'ok',
+        'message': "Post was successfully created."
+    }
+
+@ig.route('/api/posts/update', methods=["POST"])
+@token_required # you should be authorized/logged in
+def updatePostsAPI(user):
+    data = request.json # this is coming from POST request Body
+
+    post_id = data['postId']
+
+    post = Post.query.get(post_id)
+    if post.user_id != user.id:
+        return {
+            'status': 'not ok',
+            'message': "You cannot update another user's post!" #gotta be in "" bc the comma
+        }
+
+    title = data['title']
+    caption = data['caption']
+    img_url = data['imgUrl']
+
+    post.updatePostInfo(title, img_url, caption)
+    post.saveUpdates()
 
     return{
         'status': 'ok',
