@@ -165,6 +165,10 @@ class Product(db.Model):
         self.img_url = img_url
         self.description = description
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
     def add(self, product):
         db.session.append(product)
         db.session.commit()
@@ -172,3 +176,12 @@ class Product(db.Model):
     def remove(self, product):
         db.session.remove(product)
         db.session.commit()
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+            'img_url': self.img_url,
+            'description': self.description,
+        }

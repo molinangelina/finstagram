@@ -2,7 +2,8 @@
 
 {% block content %}
     <div class="mx-auto card text-decoration-none text-center" style="width: 18rem;">
-        <img src="{{ url_for('static', filename=img_url) }}" class="card-img-top" alt="{{ product.name }}">
+        <!-- <img src="{{ url_for('static', filename=img_url) }}" class="card-img-top" alt="{{ product.name }}"> -->
+        <img src="{{ product.img_url }}" class="card-img-top" alt="{{ product.name }}">
         <div class="card-body">
         <h5 class="card-title">{{ product.name }}</h5>
         <p class="card-text">{{ product.caption }}</p>

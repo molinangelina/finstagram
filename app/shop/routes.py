@@ -54,3 +54,23 @@ def removeFromCart(product_id):
 #     current_user.cart.clear(product)
 #     current_user.save()
 #     return render_template('cart.html')
+
+####################### API ROUTES #######################
+@shop.route('/api/products', methods=['POST', 'GET'])
+def getAllProductsAPI():
+    # args = request.args
+    # pin = args.get('pin')
+    # print(pin, type(pin))
+    # if pin == '1234':
+
+        products = Product.query.all() #list of posts
+
+        my_products = [p.to_dict() for p in products]
+        print(my_products)
+        return {'status': 'ok', 'total_results': len(products), 'products': my_products}
+    # else:
+    #     return {
+    #         'status': 'not ok',
+    #         'code': 'Invalid pin',
+    #         'message': 'The pin number was incorrect, please try again'
+    #     }
