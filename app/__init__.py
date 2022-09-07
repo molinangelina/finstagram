@@ -9,6 +9,7 @@ from flask_cors import CORS
 from .auth.routes import auth
 from .ig.routes import ig
 from .shop.routes import shop
+from .shop2.routes import shop2
 from .models import User
 
 app = Flask(__name__)
@@ -24,6 +25,7 @@ def load_user(user_id):
 app.register_blueprint(auth)
 app.register_blueprint(ig)
 app.register_blueprint(shop)
+app.register_blueprint(shop2)
 
 app.config.from_object(Config)
 
