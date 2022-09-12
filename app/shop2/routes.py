@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from ..apiauthhelper import token_required
-from app.models import User, Product2
+from app.models import User, Product2, cart2
 
 shop2 = Blueprint('shop2', __name__)
 
@@ -20,17 +20,28 @@ def getOneProduct(product_id):
         'product': product.to_dict()
     }
 
-@shop2.route('/api/cart')
+@shop2.route('/api/cart', methods=["GET"])
 @token_required #whos cart are you getting?
 def getCart(user):
-    pass
+    return {
+        'status': 'ok',
+        'cart': [p.to_dict() for p in user.getCart()] # getting list of all of the cart items 
+    }
 
 @shop2.route('/api/cart/add', methods=["POST"]) #what kind of item we're adding
 @token_required #whos cart to add it to 
 def addToCart(user):
-    pass
+    data = request.json
+    product_id = data['productId'] # productId is coming from JS(react)
+    product = Product2.query.get(product_id)
+    user.addToCart(product)
+    return {'status':'ok','message':'Successfully added to cart.'}
 
 @shop2.route('/api/cart/remove', methods=["POST"]) #what kind of item we're adding
 @token_required #whos logged in
 def removeFromCart(user):
-    pass
+    data = request.json
+    product_id = data['productId']
+    product = Product2.query.get(product_id)
+    user.removeFromCart(product)
+    return {'status':'ok','message':'Successfully removed from cart.'}

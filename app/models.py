@@ -51,18 +51,17 @@ class User(db.Model, UserMixin):
         secondary = user_pokemon,
         backref = 'trainers',
         lazy = 'dynamic'
-        )
+    )
     cart = db.relationship("Product",
         secondary = user_product,
         backref = 'customers',
         lazy = 'dynamic'
-        )
-    
+    )
     cart2 = db.relationship("Product2", # relationship with Product2 Table
         secondary = cart2, #talking abt variable "cart2" that was made previously
         backref = 'cart_users', # from the cart i should be able to tell u who the customer/user is, the person who has the cart items
         lazy = 'dynamic' # the way in which it loads up the query
-        )
+    )
 
     def __init__(self, username, email, password):
         self.username = username
@@ -85,6 +84,12 @@ class User(db.Model, UserMixin):
             'email': self.email,
             'token': self.apitoken
         }
+
+    # returns a list of product objects 
+    def getCart(self):
+        list_of_tuples = db.session.query(cart2).filter(cart2.c.user_id==self.id).all()
+        return [Product2.query.get(t[1]) for t in list_of_tuples] #looping through list_of_tuples
+
     def saveToDB(self):
         db.session.commit()
     
@@ -99,6 +104,14 @@ class User(db.Model, UserMixin):
         # put them all together
         all = followed.union(mine).order_by(Post.date_created.desc())
         return all
+    
+    def addToCart(self, product):
+        self.cart2.append(product)
+        db.session.commit()
+
+    def removeFromCart(self, product):
+        self.cart2.remove(product)
+        db.session.commit()
 
 class Pokemon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -221,15 +234,3 @@ class Product2(db.Model):
             'description': self.description,
             'price': self.price
         }
-
-    # def save(self):
-    #     db.session.add(self)
-    #     db.session.commit()
-
-    # def add(self, product):
-    #     db.session.append(product)
-    #     db.session.commit()
-    
-    def remove(self, product):
-        db.session.remove(product)
-        db.session.commit()
